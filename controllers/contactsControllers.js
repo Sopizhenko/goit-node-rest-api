@@ -3,6 +3,7 @@ import contactsService from "../services/contactsServices.js";
 import {
   createContactSchema,
   updateContactSchema,
+  updateStatusSchema,
 } from "../schemas/contactsSchemas.js";
 
 export const getAllContacts = async (req, res) => {
@@ -51,8 +52,13 @@ export const createContact = async (req, res) => {
       return res.status(400).json({ message: error.message });
     }
 
-    const { name, email, phone } = req.body;
-    const newContact = await contactsService.addContact(name, email, phone);
+    const { name, email, phone, favorite } = req.body;
+    const newContact = await contactsService.addContact(
+      name,
+      email,
+      phone,
+      favorite
+    );
 
     if (!newContact) {
       return res.status(500).json({ message: "Failed to create contact" });
@@ -74,6 +80,30 @@ export const updateContact = async (req, res) => {
     }
 
     const updatedContact = await contactsService.updateContact(id, req.body);
+
+    if (!updatedContact) {
+      return res.status(404).json({ message: "Not found" });
+    }
+
+    res.status(200).json(updatedContact);
+  } catch (error) {
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export const updateStatusContact = async (req, res) => {
+  try {
+    const { contactId } = req.params;
+    const { error } = updateStatusSchema.validate(req.body);
+
+    if (error) {
+      return res.status(400).json({ message: error.message });
+    }
+
+    const updatedContact = await contactsService.updateStatusContact(
+      contactId,
+      req.body
+    );
 
     if (!updatedContact) {
       return res.status(404).json({ message: "Not found" });
