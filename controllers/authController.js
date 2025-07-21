@@ -2,6 +2,26 @@ import Joi from "joi";
 import bcrypt from "bcrypt";
 import User from "../models/User.js";
 import jwt from "jsonwebtoken";
+import gravatar from "gravatar";
+import multer from "multer";
+import path from "path";
+import fs from "fs/promises";
+
+const tempDir = path.join(process.cwd(), "temp");
+const avatarsDir = path.join(process.cwd(), "public", "avatars");
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, tempDir);
+  },
+  filename: (req, file, cb) => {
+    // Унікальне ім'я: userId + timestamp + розширення
+    const ext = path.extname(file.originalname);
+    cb(null, `${req.user.id}_${Date.now()}${ext}`);
+  },
+});
+
+const upload = multer({ storage });
 
 const registerSchema = Joi.object({
   email: Joi.string().email().required(),
@@ -20,15 +40,18 @@ export const register = async (req, res, next) => {
       return res.status(409).json({ message: "Email in use" });
     }
     const hashedPassword = await bcrypt.hash(password, 10);
+    const avatarurl = gravatar.url(email, { s: "250", d: "retro" }, true);
     const user = await User.create({
       email,
       password: hashedPassword,
       subscription: "starter",
+      avatarurl,
     });
     res.status(201).json({
       user: {
         email: user.email,
         subscription: user.subscription,
+        avatarurl: user.avatarurl,
       },
     });
   } catch (err) {
@@ -99,3 +122,23 @@ export const currentUser = (req, res) => {
     subscription: user.subscription,
   });
 };
+
+export const updateAvatar = [
+  upload.single("avatar"),
+  async (req, res, next) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({ message: "No file uploaded" });
+      }
+      const { path: tempPath, filename } = req.file;
+      const newPath = path.join(avatarsDir, filename);
+      await fs.rename(tempPath, newPath);
+      const avatarurl = `/avatars/${filename}`;
+      req.user.avatarurl = avatarurl;
+      await req.user.save();
+      res.status(200).json({ avatarurl });
+    } catch (err) {
+      next(err);
+    }
+  },
+];

@@ -169,3 +169,21 @@ curl -X PATCH http://localhost:3000/api/contacts/1/favorite \
   updatedAt: DATE
 }
 ```
+
+- `PATCH /api/auth/avatars` - оновити аватар користувача (multipart/form-data, потрібен токен)
+
+### Оновлення аватарки користувача
+
+- `PATCH /api/auth/avatars` — оновити аватар користувача
+  - Заголовок: `Authorization: Bearer <token>`
+  - Тіло: `multipart/form-data`, поле файлу — `avatar`
+  - Відповідь 200: `{ "avatarURL": "/avatars/<ім'я_файлу>" }`
+  - Відповідь 401: `{ "message": "Not authorized" }`
+
+#### Приклад curl для оновлення аватарки:
+
+```bash
+curl -X PATCH http://localhost:3000/api/auth/avatars \
+  -H "Authorization: Bearer <your_token>" \
+  -F "avatar=@/path/to/your/avatar.jpg"
+```

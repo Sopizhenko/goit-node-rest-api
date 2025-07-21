@@ -1,6 +1,8 @@
 import express from "express";
 import morgan from "morgan";
 import cors from "cors";
+import path from "path";
+import { fileURLToPath } from "url";
 
 import contactsRouter from "./routes/contactsRouter.js";
 import authRouter from "./routes/authRouter.js";
@@ -8,9 +10,15 @@ import { initDatabase } from "./config/initDatabase.js";
 
 const app = express();
 
+// Додаю визначення __dirname для ES-модуля
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
 app.use(morgan("tiny"));
 app.use(cors());
 app.use(express.json());
+
+// Додаю middleware для роздачі статики з папки public
+app.use(express.static(path.join(__dirname, "public")));
 
 app.use("/api/contacts", contactsRouter);
 app.use("/api/auth", authRouter);

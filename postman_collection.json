@@ -178,6 +178,35 @@
       }
     },
     {
+      "name": "Auth: Update Avatar",
+      "request": {
+        "method": "PATCH",
+        "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+        "body": {
+          "mode": "formdata",
+          "formdata": [{ "key": "avatar", "type": "file", "src": "" }]
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/auth/avatars",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "auth", "avatars"]
+        },
+        "description": "Оновити аватар користувача (multipart/form-data, потрібен токен)"
+      },
+      "response": [
+        {
+          "code": 200,
+          "header": [{ "key": "Content-Type", "value": "application/json" }],
+          "body": "{\n  \"avatarURL\": \"/avatars/1_1721570000000.jpg\"\n}"
+        },
+        {
+          "code": 401,
+          "header": [{ "key": "Content-Type", "value": "application/json" }],
+          "body": "{\n  \"message\": \"Not authorized\"\n}"
+        }
+      ]
+    },
+    {
       "name": "Test Cases",
       "item": [
         {
