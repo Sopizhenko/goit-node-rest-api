@@ -11,4 +11,13 @@ export const config = {
     host: process.env.DB_HOST || "localhost",
     port: process.env.DB_PORT || 5432,
   },
+  email: {
+    host: process.env.EMAIL_HOST || "smtp.meta.ua",
+    port: process.env.EMAIL_PORT || 465,
+    secure: true,
+    auth: {
+      user: process.env.EMAIL_AUTH_USER || "goitnodejs@meta.ua",
+      pass: process.env.EMAIL_AUTH_PASS || "password",
+    },
+  },
 };

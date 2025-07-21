@@ -187,3 +187,20 @@ curl -X PATCH http://localhost:3000/api/auth/avatars \
   -H "Authorization: Bearer <your_token>" \
   -F "avatar=@/path/to/your/avatar.jpg"
 ```
+
+- `POST /api/auth/verify` - повторна відправка verification email
+
+### Повторна відправка verification email
+
+- `POST /api/auth/verify` — повторно надіслати лист для підтвердження email
+  - Тіло: `{ "email": "example@example.com" }`
+  - Відповідь 200: `{ "message": "Verification email sent" }`
+  - Відповідь 400: `{ "message": "missing required field email" }`, `{ "message": "Verification has already been passed" }`, `{ "message": "User not found" }`
+
+#### Приклад curl для повторної відправки verification email:
+
+```bash
+curl -X POST http://localhost:3000/api/auth/verify \
+  -H "Content-Type: application/json" \
+  -d '{"email": "example@example.com"}'
+```

@@ -207,6 +207,45 @@
       ]
     },
     {
+      "name": "Auth: Resend Verification Email",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"example@example.com\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/auth/verify",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "auth", "verify"]
+        },
+        "description": "Повторна відправка verification email користувачу"
+      },
+      "response": [
+        {
+          "code": 200,
+          "header": [{ "key": "Content-Type", "value": "application/json" }],
+          "body": "{\n  \"message\": \"Verification email sent\"\n}"
+        },
+        {
+          "code": 400,
+          "header": [{ "key": "Content-Type", "value": "application/json" }],
+          "body": "{\n  \"message\": \"missing required field email\"\n}"
+        },
+        {
+          "code": 400,
+          "header": [{ "key": "Content-Type", "value": "application/json" }],
+          "body": "{\n  \"message\": \"Verification has already been passed\"\n}"
+        },
+        {
+          "code": 400,
+          "header": [{ "key": "Content-Type", "value": "application/json" }],
+          "body": "{\n  \"message\": \"User not found\"\n}"
+        }
+      ]
+    },
+    {
       "name": "Test Cases",
       "item": [
         {

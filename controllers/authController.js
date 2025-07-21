@@ -6,6 +6,8 @@ import gravatar from "gravatar";
 import multer from "multer";
 import path from "path";
 import fs from "fs/promises";
+import { sendVerificationEmail } from "../services/emailService.js";
+import { v4 as uuidv4 } from "uuid";
 
 const tempDir = path.join(process.cwd(), "temp");
 const avatarsDir = path.join(process.cwd(), "public", "avatars");
@@ -40,19 +42,24 @@ export const register = async (req, res, next) => {
       return res.status(409).json({ message: "Email in use" });
     }
     const hashedPassword = await bcrypt.hash(password, 10);
-    const avatarurl = gravatar.url(email, { s: "250", d: "retro" }, true);
+    const avatarURL = gravatar.url(email, { s: "250", d: "retro" }, true);
+    const verificationToken = uuidv4();
     const user = await User.create({
       email,
       password: hashedPassword,
       subscription: "starter",
-      avatarurl,
+      avatarURL,
+      verificationToken,
+      verify: false,
     });
+    await sendVerificationEmail(email, verificationToken);
     res.status(201).json({
       user: {
         email: user.email,
         subscription: user.subscription,
-        avatarurl: user.avatarurl,
+        avatarURL: user.avatarURL,
       },
+      message: "Registration successful. Please verify your email.",
     });
   } catch (err) {
     next(err);
@@ -74,6 +81,9 @@ export const login = async (req, res, next) => {
     const user = await User.findOne({ where: { email } });
     if (!user) {
       return res.status(401).json({ message: "Email or password is wrong" });
+    }
+    if (!user.verify) {
+      return res.status(401).json({ message: "Email not verified" });
     }
     const passwordMatch = await bcrypt.compare(password, user.password);
     if (!passwordMatch) {
@@ -142,3 +152,49 @@ export const updateAvatar = [
     }
   },
 ];
+
+export const verifyEmail = async (req, res, next) => {
+  try {
+    const { verificationToken } = req.params;
+    const user = await User.findOne({ where: { verificationToken } });
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    user.verify = true;
+    user.verificationToken = null;
+    await user.save();
+    res.status(200).json({ message: "Verification successful" });
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const resendVerificationEmail = async (req, res, next) => {
+  try {
+    const { email } = req.body;
+    if (!email) {
+      return res.status(400).json({ message: "missing required field email" });
+    }
+    const user = await User.findOne({ where: { email } });
+    if (!user) {
+      return res.status(400).json({ message: "User not found" });
+    }
+    if (user.verify) {
+      return res
+        .status(400)
+        .json({ message: "Verification has already been passed" });
+    }
+    if (!user.verificationToken) {
+      return res
+        .status(400)
+        .json({ message: "No verification token. Please register again." });
+    }
+    await sendVerificationEmail(email, user.verificationToken);
+    res.status(200).json({ message: "Verification email sent" });
+  } catch (err) {
+    if (err.isJoi) {
+      return res.status(400).json({ message: err.message });
+    }
+    next(err);
+  }
+};
