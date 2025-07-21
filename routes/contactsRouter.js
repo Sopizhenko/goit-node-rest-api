@@ -1,13 +1,17 @@
 import express from "express";
+import authMiddleware from "../middlewares/authMiddleware.js";
 import {
   getAllContacts,
   getOneContact,
   deleteContact,
   createContact,
   updateContact,
+  updateStatusContact,
 } from "../controllers/contactsControllers.js";
 
 const contactsRouter = express.Router();
+
+contactsRouter.use(authMiddleware);
 
 contactsRouter.get("/", getAllContacts);
 
@@ -18,5 +22,7 @@ contactsRouter.delete("/:id", deleteContact);
 contactsRouter.post("/", createContact);
 
 contactsRouter.put("/:id", updateContact);
+
+contactsRouter.patch("/:contactId/favorite", updateStatusContact);
 
 export default contactsRouter;

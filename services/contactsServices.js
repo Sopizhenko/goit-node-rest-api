@@ -1,18 +1,12 @@
-import fs from "fs/promises";
-import path from "path";
-import { fileURLToPath } from "url";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-const contactsPath = path.join(__dirname, "..", "db", "contacts.json");
+import Contact from "../models/Contact.js";
 
 // Функція для отримання всіх контактів
 async function listContacts() {
   try {
-    const data = await fs.readFile(contactsPath, "utf-8");
-    return JSON.parse(data);
+    const contacts = await Contact.findAll();
+    return contacts;
   } catch (error) {
+    console.error("Error fetching contacts:", error);
     return [];
   }
 }
@@ -20,9 +14,10 @@ async function listContacts() {
 // Функція для отримання контакту за id
 async function getContactById(contactId) {
   try {
-    const contacts = await listContacts();
-    return contacts.find((contact) => contact.id === contactId) || null;
+    const contact = await Contact.findByPk(contactId);
+    return contact;
   } catch (error) {
+    console.error("Error fetching contact by id:", error);
     return null;
   }
 }
@@ -30,42 +25,31 @@ async function getContactById(contactId) {
 // Функція для видалення контакту
 async function removeContact(contactId) {
   try {
-    const contacts = await listContacts();
-    const contactToRemove = contacts.find(
-      (contact) => contact.id === contactId
-    );
-
-    if (!contactToRemove) {
+    const contact = await Contact.findByPk(contactId);
+    if (!contact) {
       return null;
     }
 
-    const filteredContacts = contacts.filter(
-      (contact) => contact.id !== contactId
-    );
-    await fs.writeFile(contactsPath, JSON.stringify(filteredContacts, null, 2));
-
-    return contactToRemove;
+    await contact.destroy();
+    return contact;
   } catch (error) {
+    console.error("Error removing contact:", error);
     return null;
   }
 }
 
 // Функція для додавання контакту
-async function addContact(name, email, phone) {
+async function addContact(name, email, phone, favorite = false) {
   try {
-    const contacts = await listContacts();
-    const newContact = {
-      id: Date.now().toString(),
+    const newContact = await Contact.create({
       name,
       email,
       phone,
-    };
-
-    contacts.push(newContact);
-    await fs.writeFile(contactsPath, JSON.stringify(contacts, null, 2));
-
+      favorite,
+    });
     return newContact;
   } catch (error) {
+    console.error("Error creating contact:", error);
     return null;
   }
 }
@@ -73,25 +57,32 @@ async function addContact(name, email, phone) {
 // Функція для оновлення контакту
 async function updateContact(contactId, updateData) {
   try {
-    const contacts = await listContacts();
-    const contactIndex = contacts.findIndex(
-      (contact) => contact.id === contactId
-    );
-
-    if (contactIndex === -1) {
+    const contact = await Contact.findByPk(contactId);
+    if (!contact) {
       return null;
     }
 
-    // Оновлюємо тільки передані поля
-    contacts[contactIndex] = {
-      ...contacts[contactIndex],
-      ...updateData,
-    };
-
-    await fs.writeFile(contactsPath, JSON.stringify(contacts, null, 2));
-
-    return contacts[contactIndex];
+    await contact.update(updateData);
+    return contact;
   } catch (error) {
+    console.error("Error updating contact:", error);
+    return null;
+  }
+}
+
+// Функція для оновлення статусу контакту
+async function updateStatusContact(contactId, updateData) {
+  try {
+    const contact = await Contact.findByPk(contactId);
+    if (!contact) {
+      return null;
+    }
+
+    // Оновлюємо тільки поле favorite
+    await contact.update({ favorite: updateData.favorite });
+    return contact;
+  } catch (error) {
+    console.error("Error updating contact status:", error);
     return null;
   }
 }
@@ -102,4 +93,5 @@ export default {
   removeContact,
   addContact,
   updateContact,
+  updateStatusContact,
 };

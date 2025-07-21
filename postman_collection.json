@@ -1,0 +1,322 @@
+{
+  "info": {
+    "name": "Contacts API",
+    "description": "REST API для управління контактами з використанням PostgreSQL та Sequelize",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Get All Contacts",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/contacts",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "contacts"]
+        },
+        "description": "Отримати всі контакти"
+      }
+    },
+    {
+      "name": "Get Contact by ID",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/contacts/1",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "contacts", "1"]
+        },
+        "description": "Отримати контакт за ID"
+      }
+    },
+    {
+      "name": "Create New Contact",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"John Doe\",\n  \"email\": \"john@example.com\",\n  \"phone\": \"+1234567890\",\n  \"favorite\": false\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/contacts",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "contacts"]
+        },
+        "description": "Створити новий контакт"
+      }
+    },
+    {
+      "name": "Update Contact",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Jane Doe\",\n  \"email\": \"jane@example.com\",\n  \"phone\": \"+0987654321\",\n  \"favorite\": true\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/contacts/1",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "contacts", "1"]
+        },
+        "description": "Оновити контакт"
+      }
+    },
+    {
+      "name": "Update Contact Status (Favorite)",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"favorite\": true\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/contacts/1/favorite",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "contacts", "1", "favorite"]
+        },
+        "description": "Оновити статус favorite контакту"
+      }
+    },
+    {
+      "name": "Delete Contact",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/contacts/1",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "contacts", "1"]
+        },
+        "description": "Видалити контакт"
+      }
+    },
+    {
+      "name": "Auth: Register",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"password123\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/auth/register",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "auth", "register"]
+        },
+        "description": "Реєстрація нового користувача"
+      }
+    },
+    {
+      "name": "Auth: Login",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"password123\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/auth/login",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "auth", "login"]
+        },
+        "description": "Логін користувача, повертає токен"
+      }
+    },
+    {
+      "name": "Auth: Logout",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+        "url": {
+          "raw": "{{baseUrl}}/api/auth/logout",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "auth", "logout"]
+        },
+        "description": "Логаут користувача (потрібен токен)"
+      }
+    },
+    {
+      "name": "Auth: Current User",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+        "url": {
+          "raw": "{{baseUrl}}/api/auth/current",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "auth", "current"]
+        },
+        "description": "Отримати поточного користувача (потрібен токен)"
+      }
+    },
+    {
+      "name": "Test Cases",
+      "item": [
+        {
+          "name": "Create Contact - Valid Data",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Test Contact\",\n  \"email\": \"test@example.com\",\n  \"phone\": \"+1111111111\",\n  \"favorite\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/contacts",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "contacts"]
+            },
+            "description": "Тест створення контакту з валідними даними"
+          }
+        },
+        {
+          "name": "Create Contact - Invalid Email",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Test Contact\",\n  \"email\": \"invalid-email\",\n  \"phone\": \"+1111111111\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/contacts",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "contacts"]
+            },
+            "description": "Тест створення контакту з невалідним email"
+          }
+        },
+        {
+          "name": "Create Contact - Missing Required Fields",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Test Contact\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/contacts",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "contacts"]
+            },
+            "description": "Тест створення контакту з відсутніми обов'язковими полями"
+          }
+        },
+        {
+          "name": "Update Contact Status - Invalid Body",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Test\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/contacts/1/favorite",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "contacts", "1", "favorite"]
+            },
+            "description": "Тест оновлення статусу з невалідним body"
+          }
+        },
+        {
+          "name": "Get Non-existent Contact",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/contacts/999999",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "contacts", "999999"]
+            },
+            "description": "Тест отримання неіснуючого контакту"
+          }
+        },
+        {
+          "name": "Update Non-existent Contact",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Updated Name\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/contacts/999999",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "contacts", "999999"]
+            },
+            "description": "Тест оновлення неіснуючого контакту"
+          }
+        },
+        {
+          "name": "Delete Non-existent Contact",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/contacts/999999",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "contacts", "999999"]
+            },
+            "description": "Тест видалення неіснуючого контакту"
+          }
+        }
+      ]
+    }
+  ]
+}
