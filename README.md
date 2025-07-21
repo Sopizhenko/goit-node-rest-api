@@ -53,6 +53,47 @@ curl -X PATCH http://localhost:3000/api/contacts/1/favorite \
   -d '{"favorite": true}'
 ```
 
+## Аутентифікація та авторизація
+
+### Реєстрація
+
+- `POST /api/auth/register` — створити нового користувача
+  - Тіло: `{ "email": "user@example.com", "password": "password123" }`
+  - Відповідь 201: `{ "user": { "email": "user@example.com", "subscription": "starter" } }`
+
+### Логін
+
+- `POST /api/auth/login` — отримати токен
+  - Тіло: `{ "email": "user@example.com", "password": "password123" }`
+  - Відповідь 200: `{ "token": "jwt-token", "user": { "email": "user@example.com", "subscription": "starter" } }`
+
+### Логаут
+
+- `POST /api/auth/logout` — вийти з акаунта (потрібен токен)
+  - Заголовок: `Authorization: Bearer <token>`
+  - Відповідь 204: без тіла
+
+### Поточний користувач
+
+- `GET /api/auth/current` — отримати email і subscription поточного користувача (потрібен токен)
+  - Заголовок: `Authorization: Bearer <token>`
+  - Відповідь 200: `{ "email": "user@example.com", "subscription": "starter" }`
+
+### Захищені маршрути
+
+Всі маршрути `/api/contacts` вимагають авторизації через Bearer-токен.
+
+### Приклад curl для логіну та отримання контактів:
+
+```bash
+curl -X POST http://localhost:3000/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email": "user@example.com", "password": "password123"}'
+
+curl http://localhost:3000/api/contacts \
+  -H "Authorization: Bearer <your_token>"
+```
+
 ## Тестування API
 
 ### Postman Collection
